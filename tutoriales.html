@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapiens UMH - Tutoriales de Construcción</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        body { 
+            margin: 0; background: #0a0a0a; color: #eee; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; height: 100vh; overflow: hidden; 
+        }
+
+        /* =========================================
+           MENÚ GLOBAL DESPLEGABLE (Estilo Captura)
+           ========================================= */
+        #menu-global-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.6); z-index: 4000; display: none;
+            backdrop-filter: blur(2px);
+        }
+        
+        #menu-global {
+            position: fixed; top: 0; left: -300px; width: 280px; height: 100vh;
+            background: #111; z-index: 4001; border-right: 1px solid #222;
+            transition: left 0.3s ease; display: flex; flex-direction: column;
+            padding-top: 20px; box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+        }
+        
+        #menu-global.abierto { left: 0; }
+        
+        .menu-global-header { 
+            display: flex; align-items: center; padding: 0 20px 30px 20px; 
+            border-bottom: 1px solid #222; margin-bottom: 20px;
+        }
+        
+        .btn-rojo-menu { 
+            background: #e74c3c; color: white; border: none; padding: 8px 15px; 
+            font-weight: bold; cursor: pointer; border-radius: 4px; margin-right: 15px;
+            font-size: 0.9rem; letter-spacing: 1px; transition: 0.2s;
+        }
+        .btn-rojo-menu:hover { background: #c0392b; }
+        
+        .menu-global-link {
+            color: #888; text-decoration: none; padding: 20px 30px; font-size: 0.9rem;
+            letter-spacing: 1px; text-transform: uppercase; transition: 0.3s;
+            display: block;
+        }
+        .menu-global-link:hover { color: #fff; background: #1a1a1a; }
+        .menu-global-link.active { background: #e74c3c; color: #fff; font-weight: bold; }
+
+
+        /* =========================================
+           MENÚ LATERAL DE PASOS DEL TUTORIAL
+           ========================================= */
+        .sidebar-tutoriales { 
+            width: 300px; background: #111; border-right: 2px solid #222; 
+            display: flex; flex-direction: column; padding: 30px 0; z-index: 10;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+        
+        .tuto-btn { 
+            background: transparent; border: none; color: #aaa; text-align: left; 
+            padding: 15px 30px; font-size: 1.1rem; cursor: pointer; transition: 0.3s; 
+            border-left: 4px solid transparent; 
+        }
+        .tuto-btn:hover { background: #1a1a1a; color: #fff; }
+        .tuto-btn.activo { background: #1a1a1a; color: #c0392b; border-left: 4px solid #c0392b; font-weight: bold; }
+
+        /* =========================================
+           ÁREA DE CONTENIDO
+           ========================================= */
+        .contenido-tutoriales { 
+            flex: 1; padding: 50px 80px; overflow-y: auto; background: #0a0a0a; scroll-behavior: smooth;
+        }
+        
+        .seccion-tuto { display: none; animation: fadeIn 0.4s ease-out; max-width: 900px; margin: 0 auto; }
+        .seccion-tuto.activo { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { color: #fff; font-size: 2.8rem; border-bottom: 2px solid #222; padding-bottom: 10px; margin-top: 0; margin-bottom: 20px; }
+        h2 { color: #c0392b; font-size: 1.8rem; margin-top: 40px; margin-bottom: 20px; }
+        p, li { font-size: 1.15rem; line-height: 1.7; color: #ccc; margin-bottom: 20px; }
+        .intro-texto { font-size: 1.3rem; color: #aaa; font-style: italic; margin-bottom: 40px; }
+
+        .paso-caja { background: #151515; padding: 25px; border-radius: 10px; border-left: 5px solid #c0392b; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .paso-caja h3 { margin-top: 0; color: #f1c40f; font-size: 1.4rem; margin-bottom: 15px; }
+        
+        .caja-destacada { background: rgba(192, 57, 43, 0.1); border: 1px solid #c0392b; padding: 25px; border-radius: 10px; margin-bottom: 30px; }
+        .caja-destacada h3 { color: #e74c3c; margin-top: 0; }
+
+        .caja-verde { background: rgba(46, 204, 113, 0.1); border-color: #2ecc71; }
+        .caja-verde h3 { color: #2ecc71; }
+        .caja-azul { background: rgba(52, 152, 219, 0.1); border-color: #3498db; }
+        .caja-azul h3 { color: #3498db; }
+        
+    </style>
+</head>
+<body>
+
+    <div id="menu-global-overlay" onclick="toggleMenu()"></div>
+    <div id="menu-global">
+        <div class="menu-global-header">
+            <button class="btn-rojo-menu" onclick="toggleMenu()">MENÚ</button>
+            <img src="logoUMH_negativo.png" style="height: 25px; filter: brightness(0.9);" alt="Sapiens">
+        </div>
+        <a href="mapa.html" class="menu-global-link">INICIO. MAPA</a>
+        <a href="index.html" class="menu-global-link">CÁMARA ESTENOPEICA</a>
+        <a href="cuarto.html" class="menu-global-link">CUARTO OSCURO</a>
+        <a href="tutoriales.html" class="menu-global-link active">TUTORIAL: CREAR<br>CÁMARA</a>
+    </div>
+
+    <nav class="sidebar-tutoriales">
+        
+        <div style="display: flex; align-items: center; padding: 0 20px 30px 20px;">
+            <button class="btn-rojo-menu" onclick="toggleMenu()">MENÚ</button>
+            <img src="logoUMH_negativo.png" style="height: 25px; filter: brightness(0.7);" alt="Sapiens">
+        </div>
+        
+        <h3 style="color:#555; padding: 0 30px; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 10px;">Paso a paso</h3>
+        
+        <button class="tuto-btn activo" onclick="mostrarTuto('caja', this)">📦 1. Fabricar la Cámara</button>
+        <button class="tuto-btn" onclick="mostrarTuto('foto', this)">📷 2. Hacer la Foto</button>
+        <button class="tuto-btn" onclick="mostrarTuto('cuarto', this)">🧪 3. El Cuarto Oscuro</button>
+        <button class="tuto-btn" onclick="mostrarTuto('movil', this)">📱 4. Hazlo con el Móvil</button>
+    </nav>
+
+    <main class="contenido-tutoriales">
+        
+        <section id="caja" class="seccion-tuto activo">
+            <h1>Tutorial: Haz tu propia cámara</h1>
+            <p class="intro-texto">Atrapa la luz con una caja de cartón. La fotografía estenopeica es la forma más pura de capturar una imagen. Sin lentes, sin electrónica compleja; solo tú, una caja y la física de la luz. Aquí aprenderás a construir tu propia cámara y a revelar tus fotos en casa.</p>
+            
+            <div class="caja-destacada">
+                <h3>Materiales Necesarios</h3>
+                <ul>
+                    <li><strong>Cuerpo de la cámara:</strong> Una caja o lata (o cualquier recipiente similar que se pueda cerrar por completo y herméticamente).</li>
+                    <li><strong>Material sensible:</strong> Papel fotográfico o de película.</li>
+                    <li><strong>Para el estenopo:</strong> Un alfiler, un clip o un imperdible (cualquier utensilio que te permita hacer un agujero muy pequeño).</li>
+                    <li>Papel aluminio.</li>
+                    <li>Cinta americana negra (importante que sea opaca).</li>
+                    <li>Pintura negra mate (recomendable en spray).</li>
+                    <li>Tijeras.</li>
+                    <li>Luz roja de seguridad (puedes usar una bombilla roja LED).</li>
+                </ul>
+            </div>
+            
+            <div class="paso-caja">
+                <h3>Paso 1: Preparar el interior</h3>
+                <p>Primero cogemos nuestro cuerpo (el recipiente) y lo pintamos por dentro completamente de negro mate y lo dejamos secar bien. Esto es vital para evitar reflejos de luz internos que estropeen la foto.</p>
+            </div>
+            
+            <div class="paso-caja">
+                <h3>Paso 2: La ventana de luz</h3>
+                <p>Luego recortamos el recipiente y le hacemos un hueco de unos 3cm x 3cm en el centro de una de las caras. Se puede coger de referencia un dedo o una tarjeta de crédito, no tiene por qué ser perfecto, es solo el hueco donde irá nuestra "lente". <em>(Si el recipiente que hemos cogido es una lata metálica fina o similar, puedes saltarte este paso y perforar directamente el metal).</em></p>
+            </div>
+
+            <div class="paso-caja">
+                <h3>Paso 3: El soporte del estenopo</h3>
+                <p>Una vez hecho el hueco, recortamos el papel aluminio de un tamaño algo más grande que el hueco que hemos hecho. Pegaremos el papel aluminio con cinta americana por dentro (el interior de la caja) para que cubra el hueco por completo. <em>(Con una lata o similar esto no es necesario).</em></p>
+            </div>
+
+            <div class="paso-caja">
+                <h3>Paso 4: Crear el Estenopo</h3>
+                <p>A continuación cogemos nuestro perforador (la aguja, el alfiler o el clip) y, con mucho cuidado, crearemos el estenopo (el pequeño agujero que permite pasar la luz) haciendo un único agujero diminuto en el centro del papel aluminio. Cuanto más limpio y pequeño sea el agujero, más nítida será la foto.</p>
+            </div>
+
+            <div class="paso-caja">
+                <h3>Paso 5: El Obturador</h3>
+                <p>Ahora haremos el obturador (una "puerta" que tape el agujero para que no permita pasar la luz). Podemos pegar un trozo de cinta americana negra sobre el estenopo, o coger restos sobrantes de antes, de forma que puedas despegarlo y pegarlo fácilmente para "abrir y cerrar" la entrada de luz cuando queramos.</p>
+            </div>
+            
+            <div class="paso-caja">
+                <h3>Paso 6: Cargar la cámara (Bajo luz roja)</h3>
+                <p>Por último, en un cuarto completamente a oscuras encendemos nuestra luz roja (para no dañar ni revelar el papel fotográfico). Ahora recortamos el papel fotográfico según el tamaño de nuestro recipiente y lo pegamos en la cara contraria al estenopo (el agujero que hemos hecho antes). <strong>La emulsión (que es la parte brillante) debe mirar hacia el agujero.</strong></p>
+                <p>Es muy importante cerrar el recipiente y asegurar los bordes con cinta americana para que no entre ni un rayo de sol.</p>
+            </div>
+
+            <div class="caja-destacada caja-verde">
+                <h3>¿Cómo nos debe quedar la cámara?</h3>
+                <p>Ahora ya podemos encender la luz. Una vez hecha, nos debería quedar el recipiente completamente cerrado para que no pase nada de luz, con el papel fotográfico en una cara interior, y en la cara de enfrente nuestro estenopo, tapado con su obturador que no permite que entre la luz.</p>
+                <p><strong>Y ahora que ya tenemos la cámara, toca salir a la calle a hacer nuestra foto.</strong></p>
+            </div>
+        </section>
+
+        <section id="foto" class="seccion-tuto">
+            <h1>Hacer la foto</h1>
+            
+            <div class="paso-caja">
+                <h3>1. Colocación y encuadre</h3>
+                <p>Una vez en el exterior, selecciona el lugar y busca tu encuadre. Debemos colocar la cámara sobre una superficie estable apuntando hacia donde queremos. Es fundamental asegurarnos de que la cámara <strong>no se mueve absolutamente nada</strong> (como el tiempo de exposición es largo, cualquier movimiento hará que la imagen salga borrosa).</p>
+            </div>
+            
+            <div class="paso-caja">
+                <h3>2. Abrir el obturador</h3>
+                <p>Con la cámara en posición y lista para hacer la foto, retiramos el "obturador" (levantamos la cinta) con cuidado para permitir que la luz pase por el estenopo y comience a dibujar la escena y grabarse en el papel fotográfico.</p>
+            </div>
+            
+            <div class="paso-caja">
+                <h3>3. El tiempo de exposición</h3>
+                <p>¿Cuánto debemos mantener nuestro obturador abierto? El papel fotográfico no es tan rápido como un sensor digital y es muy delicado; nunca debemos pasarnos o quedarnos cortos, si no la foto saldrá subexpuesta o sobreexpuesta.</p>
+                <p>Existen muchos factores (como si es a pleno sol, está nublado, es en interior), lo importante es la cantidad de luz que pasa:</p>
+                <ul>
+                    <li><strong>A plena luz del día (Mucho sol):</strong> El tiempo de exposición será el mínimo, entre 30 segundos y 1 minuto.</li>
+                    <li><strong>Día nublado o lugar con mucha sombra:</strong> Por lo general harán falta entre 10 y 15 minutos.</li>
+                    <li><strong>Luz artificial (Interiores):</strong> Nos sería prácticamente imposible sin horas de exposición.</li>
+                </ul>
+                <p>Por eso es importante revisar los tiempos de exposición según la situación en la que hagamos la foto.</p>
+            </div>
+            
+            <div class="paso-caja">
+                <h3>4. Finalizar: Cerrar y guardar</h3>
+                <p>Una vez pasado el tiempo de exposición, volvemos a tapar el estenopo cerrando nuestro obturador (la cinta) y ya tendremos nuestra "foto latente" en el papel fotográfico (está ahí, pero aún no se ve).</p>
+                <p><strong>¡Muy importante no dejar que pase la luz y no abrir la caja hasta que lleguemos de nuevo a nuestro cuarto con la luz roja!</strong></p>
+            </div>
+            
+            <p style="text-align: center; font-size: 1.2rem; margin-top: 30px; color: #f1c40f;">
+                Ahora que ya tenemos la luz capturada en nuestro papel fotográfico, este se puede llevar a un profesional para que la revele, o podemos montar un cuarto oscuro en nuestra casa. <strong>Ve al apartado 3.</strong>
+            </p>
+        </section>
+
+        <section id="cuarto" class="seccion-tuto">
+            <h1>El cuarto oscuro: Revelar la fotografía</h1>
+            <p class="intro-texto">Para ver el resultado, necesitamos un proceso químico que haga permanente la imagen.</p>
+            
+            <div class="caja-destacada">
+                <h3>Materiales de Revelado</h3>
+                <p>Si vamos a revelar la fotografía en nuestra casa necesitaremos unos químicos para realizar el proceso de revelado:</p>
+                <ul>
+                    <li><strong>1. El líquido revelador:</strong> El líquido que hace aparecer la imagen al reaccionar con la plata del papel.</li>
+                    <li><strong>2. El líquido para el baño de paro:</strong> Un ácido suave para detener la acción del revelador al instante.</li>
+                    <li><strong>3. El fijador:</strong> Hace que la imagen sea permanente y que la foto deje de ser sensible a la luz para que puedas verla al sol. Estos serían los 3 químicos principales.</li>
+                    <li><strong>4 cubetas:</strong> 3 cubetas plásticas (para cada químico) y una cuarta cubeta con agua limpia para el lavado final.</li>
+                    <li><strong>Pinzas de plástico:</strong> Para manipular y no dañar el papel con las manos.</li>
+                </ul>
+            </div>
+            
+            <h2>El proceso (Bajo luz roja)</h2>
+
+            <div class="paso-caja">
+                <h3>Paso 1: Preparación a oscuras</h3>
+                <p>Antes de nada debemos preparar 4 cubetas: 3 con los químicos reveladores y otra con agua. Ahora con todo preparado, dejamos el cuarto completamente a oscuras y encendemos la luz roja. Ahora ya podemos sacar nuestra fotografía de la cámara (que aún no veremos).</p>
+            </div>
+            
+            <div class="paso-caja">
+                <h3>Paso 2: El Revelado</h3>
+                <p>Empecemos con el revelado, lo primero es coger la fotografía con las pinzas y la ponemos boca arriba (con la cara que le ha dado la luz) en la cubeta con el líquido revelador y observaremos que la foto empieza a verse de la nada. Agitamos un poco la cubeta suavemente y cuando veamos que las zonas más oscuras se ven muy negras (intensas) y las zonas más iluminadas muy blancas (claras) la sacaremos (unos 90 segundos aproximadamente).</p>
+            </div>
+            
+            <div class="paso-caja">
+                <h3>Paso 3: Baño de Paro y Fijador</h3>
+                <p>Una vez sacado del revelador, pasamos la foto a la segunda cubeta (el baño de paro), la dejamos unos 30 segundos para "congelar" el revelado, agitamos un poco y la sacamos. Ahora la foto va directa a la tercera cubeta, la del fijador. Dejamos la fotografía de 3 a 5 minutos y <strong>¡ya podremos encender la luz normal de la habitación!</strong> (recuerda manipular la fotografía con las pinzas para no dañarla).</p>
+            </div>
+            
+            <div class="paso-caja">
+                <h3>Paso 4: Lavado y Secado</h3>
+                <p>A continuación, la fotografía estará llena de químicos, por tanto la pasamos por la última cubeta, la de agua limpia. Lavamos y dejamos la fotografía en la cubeta unos 10 minutos para eliminar cualquier resto químico. Por último toca el secado: cogemos la fotografía, la escurrimos un poco con nuestros dedos limpios, la colgamos de una esquina y dejamos que seque unos 20 minutos al aire.</p>
+                <p><em>Si es probable que durante el secado la fotografía se curve un poco por la humedad, por tanto, cuando esté completamente seca la metemos dentro de un libro pesado durante la noche para que quede plana al día siguiente.</em></p>
+            </div>
+
+            <div class="caja-destacada caja-azul">
+                <h3>Resultado: De Negativo a Positivo</h3>
+                <p>Lo que obtendrás es un negativo: lo que era blanco se ve negro y viceversa. Ahora ya tenemos nuestra fotografía física, pero la tenemos en negativo. Podemos escanearla (o sacarle una foto con el móvil) para invertir los colores digitalmente o podemos hacerlo analógicamente:</p>
+                <p>Bajo luz roja, pon tu negativo cara a cara con un papel fotográfico virgen (haciendo un "contacto"). Enciende la luz blanca del techo 1 segundo para revelar el papel nuevo. ¡Obtendrás el positivo!</p>
+            </div>
+        </section>
+
+        <section id="movil" class="seccion-tuto">
+            <h1>Hazlo con el móvil</h1>
+            
+            <div class="caja-destacada" style="background: rgba(241, 196, 15, 0.1); border-color: #f1c40f; margin-bottom: 40px;">
+                <h3 style="color: #f1c40f;">A Tener en Cuenta</h3>
+                <p>Existen muchas formas de hacer fotografía estenopeica y mil variantes para construir una cámara, pero ahí es donde entras tú. Una vez que dominas la técnica básica, la cámara deja de ser una caja de cartón para convertirse en una herramienta de exploración artística.</p>
+            </div>
+
+            <p>Este tutorial está centrado en la fotografía estenopeica más pura, pero siguiendo los principios de la luz podemos hacerla de varias formas. La manera más sencilla y accesible para todo el mundo es con nuestro móvil.</p>
+            
+            <div class="paso-caja">
+                <h3>El cuerpo de la cámara y el estenopo</h3>
+                <p>Sustituimos el papel fotográfico como receptor y pasamos a utilizar nuestro teléfono móvil como objetivo. Para esta variante, seguiremos el mismo procedimiento a la hora de crear la cámara (esta vez sí que debe ser una caja), pero ahora <strong>no meteremos el papel fotográfico</strong>, dejaremos el fondo negro o con un papel blanco.</p>
+            </div>
+
+            <div class="paso-caja">
+                <h3>El hueco para el móvil</h3>
+                <p>Cerramos la caja por completo para que no entre nada de luz, pero en la misma cara del estenopo, abriremos otro hueco (en uno de los lados, arriba o abajo), este hueco será de la forma de la cámara de nuestro teléfono.</p>
+            </div>
+
+            <div class="paso-caja">
+                <h3>Capturar la fotografía</h3>
+                <p>Así, para capturar una fotografía simplemente ponemos la cámara del móvil tapando el agujero que hemos hecho, ajustamos la cámara del móvil en <strong>modo PRO</strong> (el ISO y el obturador especialmente, para tener un largo tiempo de exposición y se vea bien la foto) y hacemos la foto. Así ya tendremos la foto a color de manera digital, saltándonos varios pasos, aunque la calidad es mucho menor.</p>
+            </div>
+
+            <div class="caja-destacada caja-azul">
+                <h3>Variante: Papel Vegetal</h3>
+                <p>Otra forma con el móvil sería exactamente igual, pero el hueco del móvil lo hacemos en el lado contrario al estenopo y colocamos en medio de la caja un papel vegetal o de horno. Así lograremos otra estética totalmente distinta.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function mostrarTuto(id, btn) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.seccion-tuto').forEach(sec => sec.classList.remove('activo'));
+            // Quitar clase activo a todos los botones de los pasos
+            document.querySelectorAll('.tuto-btn').forEach(b => b.classList.remove('activo'));
+            
+            // Activar la seleccionada
+            document.getElementById(id).classList.add('activo');
+            btn.classList.add('activo');
+            
+            // Subir el scroll arriba del todo
+            document.querySelector('.contenido-tutoriales').scrollTop = 0;
+        }
+
+        // Función para abrir/cerrar el menú global
+        function toggleMenu() {
+            const menu = document.getElementById('menu-global');
+            const overlay = document.getElementById('menu-global-overlay');
+            
+            if (menu.classList.contains('abierto')) {
+                menu.classList.remove('abierto');
+                overlay.style.display = 'none';
+            } else {
+                menu.classList.add('abierto');
+                overlay.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

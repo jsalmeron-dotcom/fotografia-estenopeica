@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapiens UMH - La Fotografía Estenopeica</title>
+
+    <meta property="og:title" content="Sapiens UMH - La Fotografía Estenopeica">
+    <meta property="og:description" content="Explora el mapa interactivo y descubre la ciencia, la historia y el tutorial paso a paso para construir tu propia cámara estenopeica.">
+    <meta property="og:image" content="https://tu-usuario.github.io/fotografia-estenopeica/preview-mapa.png">
+    <meta property="og:url" content="https://tu-usuario.github.io/fotografia-estenopeica/mapa.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        /* EL PANEL LATERAL DERECHO DE TU CAPTURA */
+        #modal-lectura {
+            position: fixed;
+            top: 0;
+            right: 0; /* Lo pega a la derecha */
+            width: 45%; /* Ocupa casi la mitad de la pantalla (ajusta si lo quieres más ancho) */
+            height: 100vh; /* Altura del 100% de la ventana */
+            background: #111; /* Fondo oscuro casi negro */
+            display: none; 
+            z-index: 3000;
+            border-left: 2px solid #222; /* Pequeña línea divisoria */
+            box-shadow: -10px 0 20px rgba(0,0,0,0.5);
+        }
+
+        .modal-contenido {
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            box-sizing: border-box; /* FUNDAMENTAL: Evita que el padding rompa la altura */
+            overflow-y: auto; /* ESTO ACTIVA LA BARRA DE DESPLAZAMIENTO */
+            position: relative;
+        }
+
+        /* Estilo para que la barra de desplazamiento quede bonita e integrada */
+        .modal-contenido::-webkit-scrollbar { width: 8px; }
+        .modal-contenido::-webkit-scrollbar-track { background: #111; }
+        .modal-contenido::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        .modal-contenido::-webkit-scrollbar-thumb:hover { background: #c0392b; }
+
+        #btn-cerrar-modal {
+            float: right; /* Lo pone arriba a la derecha */
+            background: transparent;
+            border: 1px solid #555;
+            color: #999;
+            padding: 5px 15px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            border-radius: 3px;
+        }
+        
+        #btn-cerrar-modal:hover { background: #333; color: white; border-color: white; }
+
+        /* Estilos de los textos igual que en tu captura */
+        .titulo-sapiens { font-size: 1.5rem; margin-top: 40px; color: #fff; clear: both; }
+        .modal-contenido h3 { color: #c0392b; margin-top: 25px; margin-bottom: 10px; font-size: 1.15rem; }
+        .modal-contenido p, .modal-contenido li { font-size: 1rem; line-height: 1.6; color: #ccc; margin-bottom: 15px; }
+        .modal-contenido img { width: 100%; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333; }
+        
+        /* Tabla de referentes adaptada al fondo oscuro */
+        .tabla-referentes { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
+        .tabla-referentes th, .tabla-referentes td { padding: 10px; border: 1px solid #333; text-align: left; }
+        .tabla-referentes th { background: #222; color: #fff; }
+        /* Estilo para el logo de la UMH en la esquina inferior derecha */
+.contenedor-logo-umh {
+    position: fixed;
+    bottom: 30px; /* Distancia desde el borde inferior */
+    right: 30px;  /* Distancia desde el borde derecho */
+    z-index: 500; /* Para que esté por debajo de los botones pero sobre el fondo */
+    pointer-events: none; /* Para que no moleste si intentas hacer clic en algo que esté debajo */
+}
+
+.contenedor-logo-umh img {
+    height: 50px; /* Ajusta el tamaño a tu gusto */
+    opacity: 0.8; /* Un poco de transparencia para que no distraiga demasiado */
+    transition: opacity 0.3s;
+}
+
+/* Opcional: que se ilumine al pasar el ratón por encima */
+.contenedor-logo-umh:hover img {
+    opacity: 1;
+}
+    </style>
+</head>
+<body class="body-inicio">
+
+    <main id="pantalla-inicio">
+        
+        <div class="columna-texto">
+            <h3 style="margin:0; font-size: 2rem; font-weight: normal;">LA</h3>
+            <h1 style="margin:0; font-size: 4rem; line-height: 1; margin-bottom: 20px;">FOTOGRAFÍA<br>ESTENOPEICA</h1>
+            
+            <div class="texto-intro">
+                <p>La tecnología digital actual impone barreras económicas y técnicas que alejan al individuo de la esencia creativa. El uso de equipos costosos y procesos automáticos oculta los principios físicos de la luz. Esta dependencia tecnológica genera un consumo constante y reduce la fotografía a un instante fugaz sin profundidad temporal.</p>
+                <p><strong>La Fotografía Estenopeica</strong> propone un retorno a la pureza del fenómeno óptico. Transforma objetos cotidianos y residuos, como latas o cajas, en herramientas de precisión científica para capturar la realidad.</p>
+            </div>
+
+            <button class="btn-tutorial-main" onclick="window.location.href='tutoriales.html'">
+                <span style="font-size: 1.5rem; margin-right: 15px;">📷</span> CONSTRUYE TU CÁMARA
+            </button>
+        </div>
+
+        <div class="columna-nodos">
+            <button class="nodo-burbuja beige c-grande" style="top: 15%; left: 20%;" onclick="abrirNodo('cien')">CIENCIA</button>
+            <button class="nodo-burbuja beige c-grande" style="top: 10%; left: 65%;" onclick="abrirNodo('hist')">HISTORIA</button>
+            
+            <button class="nodo-burbuja beige c-medio" style="top: 50%; left: 25%;" onclick="abrirNodo('impa')">IMPACTO</button>
+            <button class="nodo-burbuja beige c-pequeno" style="top: 45%; left: 55%;" onclick="abrirNodo('refe')">REFERENTES</button>
+            <button class="nodo-burbuja beige c-pequeno" style="top: 60%; left: 80%;" onclick="abrirNodo('sola')">SOLARIGRAFÍA</button>
+
+            <button class="nodo-burbuja rojo c-medio" style="top: 75%; left: 35%;" onclick="window.location.href='index.html'">LA CÁMARA<br>ESTENOPEICA</button>
+            <button class="nodo-burbuja rojo c-medio" style="top: 80%; left: 70%;" onclick="window.location.href='cuarto.html'">EL CUARTO<br>OSCURO</button>
+        </div>
+
+    </main>
+
+    <div id="modal-lectura" style="display: none;">
+        <div class="modal-contenido">
+            <button id="btn-cerrar-modal" onclick="cerrarNodo()">X CERRAR</button>
+            <h2 id="modal-titulo" class="titulo-sapiens"></h2>
+            <div id="modal-texto"></div>
+        </div>
+    </div>
+
+    <script>
+        const datosMapa = {
+            'cien': {
+                titulo: "Ciencia: La física de la luz y la química del cristal",
+                texto: `
+                    <img src="images (1).jfif" alt="Ciencia">
+                    <p>La fotografía estenopeica representa una aplicación pura de la óptica geométrica y la química de los haluros de plata. A diferencia de los sistemas modernos, esta técnica prescinde de la refracción (el desvío de la luz mediante lentes) para centrarse en la selección mecánica de los rayos.</p>
+                    
+                    <h3>La selección de rayos y el enfoque infinito</h3>
+                    <p>En una cámara convencional, las lentes concentran la luz en un punto; en cambio, el estenopo actúa como un filtro selectivo que solo permite el paso de un haz extremadamente estrecho de luz. Debido a que la luz viaja en línea recta, al cruzarse en este pequeño orificio, la imagen se proyecta de forma invertida en el fondo de la cámara.</p>
+                    <p>Este fenómeno otorga a la técnica una propiedad única: una <strong>profundidad de campo infinita</strong>. Dado que no hay un mecanismo de enfoque óptico, todo objeto dentro del campo de visión aparece enfocado simultáneamente.</p>
+                    
+                    <h3>El laboratorio químico invisible</h3>
+                    <p>Una vez que la luz golpea el material sensible, comienza una cadena de reacciones de oxidación y reducción. El papel fotográfico está recubierto por una emulsión de gelatina con cristales de haluros de plata sensibles a la luz.</p>
+                    <ul>
+                        <li><strong>Imagen latente:</strong> Al recibir fotones, los cristales liberan electrones que forman átomos microscópicos de plata metálica negra, creando una imagen aún invisible al ojo humano.</li>
+                        <li><strong>Revelado y fijado:</strong> Para hacerla visible, el papel se sumerge en un revelador que convierte esos cristales expuestos en granos de plata negra. Finalmente, el fijador disuelve la plata sobrante para que la imagen sea permanente y no se borre al contacto con la luz del día.</li>
+                    </ul>`
+            },
+            'hist': {
+                titulo: "Historia: De la observación antigua al registro permanente",
+                texto: `
+                    <img src="Old-Camera-Obscura.jpg" alt="Historia">
+                    <p>Los principios del estenopo no son un descubrimiento reciente, sino que cuentan con más de dos mil años de documentación.</p>
+                    
+                    <h3>Sabios antiguos y la cámara oscura</h3>
+                    <p>Las primeras observaciones surgieron en China, donde se notó que la luz reflejada por los objetos podía proyectar una imagen invertida al pasar por un pequeño agujero hacia una habitación oscura. Siglos después, el matemático árabe Alhacén realizó experimentos cruciales que demostraron la propagación rectilínea de la luz, estableciendo la cámara oscura como un instrumento científico para observar eclipses sin dañar la vista.</p>
+                    
+                    <h3>Del Renacimiento a la fotografía moderna</h3>
+                    <p>Durante el Renacimiento, figuras como Leonardo da Vinci describieron con precisión este funcionamiento para ayudar a los artistas a calcar la realidad en sus dibujos. Kepler incluso diseñó versiones portátiles para paisajes. No fue hasta el siglo XIX cuando el descubrimiento de los materiales fotosensibles permitió que esa imagen proyectada se registrara de forma permanente, dando nacimiento oficial a la fotografía.</p>`
+            },
+            'sola': {
+                titulo: "Solarigrafía: El rastro del sol en el tiempo",
+                texto: `
+                    <img src="solar.jpeg" alt="Solarigrafía">
+                    <p>La solarigrafía es una de las aplicaciones contemporáneas más fascinantes de esta técnica, uniendo la óptica rudimentaria con exposiciones que duran desde días hasta años.</p>
+                    
+                    <h3>Visualizar lo imperceptible</h3>
+                    <p>Su objetivo es registrar el rastro del sol en el cielo, permitiendo visualizar el movimiento aparente del astro debido a la rotación y traslación de la Tierra. En una sola imagen de seis meses, se puede observar cómo el arco solar sube o baja en el horizonte según la estación del año. Mientras que los edificios permanecen nítidos, todo lo que se mueve desaparece, creando una estética de paisajes fantasma.</p>
+                    
+                    <h3>Una imagen sin químicos</h3>
+                    <p>A diferencia de la fotografía analógica tradicional, la solarigrafía utiliza un fenómeno de ennegrecimiento directo. La radiación solar es tan intensa y prolongada que reduce los haluros de plata a plata metálica de forma inmediata sobre el papel. Al terminar la exposición, la imagen ya es visible sin necesidad de revelado químico.</p>`
+            },
+            'impa': {
+                titulo: "Impacto: Filosofía y educación",
+                texto: `
+                    <p>La fotografía estenopeica propone una "filosofía" que desafía el consumo tecnológico desenfrenado y fomenta una democratización real del arte.</p>
+                    
+                    <h3>Reciclaje y control creativo</h3>
+                    <p>Este proceso comienza con la resignificación de residuos, convirtiendo objetos destinados a la basura (como latas de refresco o cajas de cartón) en herramientas de precisión artística. Al fabricar su propio equipo, el fotógrafo recupera el control total sobre el proceso creativo y el conocimiento científico, alejándose del simple "disparo" automático de la era digital.</p>
+                    
+                    <h3>Un puente interdisciplinario</h3>
+                    <p>En el ámbito educativo, la técnica sirve para integrar conocimientos de óptica, geometría y química de manera práctica. Además, fomenta una relación física y emocional con el entorno: el fotógrafo debe habitar el tiempo de exposición, practicando un "saber esperar" que transforma su percepción del mundo.</p>`
+            },
+            'refe': {
+                titulo: "Referencias: Maestros de la técnica",
+                texto: `
+                    <img src="solar.jpeg" alt="Referentes">
+                    <p>La vitalidad de esta disciplina se mantiene gracias a una comunidad internacional de investigadores y artistas.</p>
+                    <table class="tabla-referentes">
+                        <tr>
+                            <th>Referente</th>
+                            <th>Especialidad / Contribución</th>
+                        </tr>
+                        <tr><td><strong>Eric Renner</strong></td><td>Fundador de The Pinhole Resource y pionero en cámaras de múltiples estenopos.</td></tr>
+                        <tr><td><strong>Diego López Calvín</strong></td><td>Co-creador del proyecto mundial de solarigrafía.</td></tr>
+                        <tr><td><strong>George Davidson</strong></td><td>Su obra "The Onion Field" (1890) fue clave para el movimiento pictorialista.</td></tr>
+                        <tr><td><strong>Paolo Gioli</strong></td><td>Artista italiano que utiliza el estenopo para cuestionar la naturaleza de la visión.</td></tr>
+                        <tr><td><strong>Mariano Dalaison</strong></td><td>Especialista en el uso de materiales reciclados en contextos sociales y pedagógicos.</td></tr>
+                        <tr><td><strong>Ilan Wolff</strong></td><td>Conocido por convertir furgonetas y grandes objetos en cámaras oscuras.</td></tr>
+                    </table>`
+            },
+            'tuto': {
+                titulo: "Tutorial: Crea tu propia Cámara",
+                texto: `
+                    <p><strong>Paso 1:</strong> Consigue una caja de cartón y píntala de negro mate por dentro para evitar reflejos.</p>
+                    <p><strong>Paso 2:</strong> En una de las caras, haz un corte cuadrado y pega un trozo de papel de aluminio.</p>
+                    <p><strong>Paso 3:</strong> Con una aguja fina, haz un pequeño agujero (estenopo) en el centro del aluminio.</p>
+                    <p><strong>Paso 4:</strong> En el lado opuesto al agujero, coloca el papel fotosensible en total oscuridad.</p>
+                    <p><strong>Paso 5:</strong> ¡Abre el estenopo y expón tu foto!</p>`
+            }
+        };
+
+        function abrirNodo(id) {
+            document.getElementById('modal-titulo').innerHTML = datosMapa[id].titulo;
+            document.getElementById('modal-texto').innerHTML = datosMapa[id].texto;
+            document.getElementById('modal-lectura').style.display = 'block'; // Usamos block para el panel lateral
+        }
+
+        function cerrarNodo() {
+            document.getElementById('modal-lectura').style.display = 'none';
+        }
+    </script>
+    <div class="contenedor-logo-umh">
+    <img src="logoUMH_negativo.png" alt="Logo UMH">
+</div>
+</body>
+</html>

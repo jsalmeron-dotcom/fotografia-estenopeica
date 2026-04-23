@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapiens UMH - Cámara Estenopeica</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        .btn-azul { background: #34495e; color: #fff; }
+        .btn-azul:hover { background: #2c3e50; }
+    </style>
+</head>
+<body style="margin: 0; overflow: hidden; background: #111;">
+
+    <button id="toggle-sidebar" onclick="toggleSidebar()">MENU</button>
+
+    <nav id="sidebar-principal" class="collapsed">
+        <div class="header-menu">
+            <img src="logoUMH_negativo.png" style="width: 120px;" alt="Sapiens">
+        </div>
+        <div class="nav-pestañas">
+            <button class="tab-btn" onclick="window.location.href='mapa.html'">Inicio: Mapa</button>
+            <button class="tab-btn activo">Cámara Estenopeica</button>
+            <button class="tab-btn" onclick="window.location.href='cuarto.html'">Cuarto Oscuro</button>
+            <button class="tab-btn" onclick="window.location.href='tutoriales.html'">TUTORIAL: CÁMARA ESTENOPEICA</button>
+        </div>
+    </nav>
+
+    <div id="panel-ajustes">
+        <h3>Configuración Óptica</h3>
+        <label>Sujeto Exterior</label>
+        <select id="objeto-tipo">
+            <option value="toroide">Anillo: Toroide</option>
+            <option value="esfera">Esfera</option>
+            <option value="caja">Cubo 3D</option>
+            <option value="imagen">Imagen Propia</option>
+        </select>
+        <input type="file" id="subir-foto" accept="image/*" style="display:none;">
+
+        <label>Diámetro del estenopo: <span id="val-estenopo">0.5mm</span></label>
+        <input type="range" id="estenopo" min="0.1" max="5" step="0.1" value="0.5">
+
+        <label>Distancia focal: <span id="val-focal">250mm</span></label>
+        <input type="range" id="focal" min="150" max="400" value="250">
+
+        <label>Distancia del objeto: <span id="val-distancia">500mm</span></label>
+        <input type="range" id="distancia" min="200" max="1000" step="10" value="500">
+
+        <label>Sensibilidad (ISO)</label>
+        <select id="iso-papel">
+            <option value="1">ISO 100</option>
+            <option value="4">ISO 400</option>
+            <option value="10">ISO 1000</option>
+        </select>
+
+        <div style="margin-top:20px; text-align:center;">
+            <button id="btn-obturador" onclick="toggleObturador()" style="width:100%; padding:12px; background:#c0392b; border:none; color:white; cursor:pointer; font-weight:bold; border-radius:5px; transition: 0.3s;">🔴 ABRIR ESTENOPO</button>
+            <p id="tiempo-exp" style="font-family:monospace; font-size:1.5rem; margin:10px 0; color:white;">0.0s</p>
+            <p id="feedback" style="color:#aaa; font-size:0.9rem; margin-bottom:10px;">Tapa cerrada.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button id="btn-previa" style="background:#f39c12; color:white; width:100%; padding:12px; border:none; cursor:pointer; font-weight:bold; border-radius:5px; transition: 0.3s;" onclick="toggleVistaPrevia()">👁️ VISTA PREVIA (Sin exponer)</button>
+                <button id="btn-ir-cuarto" style="display:none; width:100%; padding:12px; background:#8e44ad; border:none; color:white; cursor:pointer; font-weight:bold; border-radius:5px; transition: 0.3s;" onclick="irAlCuarto()">IR AL CUARTO OSCURO</button>
+                <button id="btn-nueva" class="btn-azul" onclick="reiniciarCamara()" style="width:100%; padding:12px; border:none; cursor:pointer; font-weight:bold; border-radius:5px; transition: 0.3s;">🔄 REINICIAR CÁMARA</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="area-principal" class="expanded" style="width: 100%; height: 100vh; position: relative; margin-left: 0;">
+        <div id="canvas-container" style="width: 100%; height: 100%; display: block;">
+            <button id="btn-pausa" onclick="toggleRotacion()" style="position: absolute; top: 20px; right: 240px; z-index: 100; padding:10px; background:#222; color:white; border:2px solid #3498db; cursor:pointer; font-weight:bold; border-radius:5px;">⏸️ FRENAR OBJETO</button>
+            
+            <button id="btn-xray" style="position: absolute; top: 20px; right: 20px; z-index: 100; padding:10px; background:#222; color:white; border:2px solid #e74c3c; cursor:pointer; font-weight:bold; border-radius:5px;">VER INTERIOR (ÓPTICA)</button>
+        </div>
+
+        <div id="modal-tutorial" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+            <div style="background: #1a1a1a; padding: 40px; border-radius: 10px; border-top: 5px solid #f1c40f; max-width: 600px; position: relative;">
+                <button onclick="document.getElementById('modal-tutorial').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: 1px solid #888; color: #888; cursor: pointer;">X CERRAR</button>
+                <h2 style="color: #f1c40f; font-size: 1.8rem; margin-top: 0;">Tutorial: Crea tu propia Cámara</h2>
+                <p style="color: #ccc; line-height: 1.6;"><strong>Paso 1:</strong> Consigue una caja de cartón y píntala de negro mate por dentro para evitar reflejos.</p>
+                <p style="color: #ccc; line-height: 1.6;"><strong>Paso 2:</strong> En una de las caras, haz un corte cuadrado y pega un trozo de papel de aluminio.</p>
+                <p style="color: #ccc; line-height: 1.6;"><strong>Paso 3:</strong> Con una aguja fina, haz un pequeño agujero (estenopo) en el centro del aluminio.</p>
+                <p style="color: #ccc; line-height: 1.6;"><strong>Paso 4:</strong> En el lado opuesto al agujero, coloca el papel fotosensible en total oscuridad.</p>
+                <p style="color: #ccc; line-height: 1.6;"><strong>Paso 5:</strong> ¡Abre el estenopo y expón tu foto!</p>
+            </div>
+        </div>
+        <button onclick="abrirInfo()" style="position: fixed; bottom: 20px; left: 20px; width: 70px; height: 70px; border-radius: 50%; background: #3498db; color: white; border: 2px solid #fff; font-size: 13px; font-weight: bold; cursor: pointer; z-index: 1500; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.2; transition: 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">¿Cómo<br>funciona?</button>
+
+        <div id="modal-info" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+            <div style="background: #1a1a1a; padding: 40px; border-radius: 12px; border-top: 5px solid #3498db; max-width: 650px; max-height: 85vh; overflow-y: auto; position: relative; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <button onclick="document.getElementById('modal-info').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: #333; border: none; color: #fff; cursor: pointer; border-radius: 4px; padding: 8px 12px; font-weight: bold; transition: 0.2s;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#333'">X CERRAR</button>
+                <h2 style="color: #3498db; font-size: 2rem; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 15px;">La Cámara Estenopeica</h2>
+
+                <h3 style="color: #f1c40f; font-size: 1.3rem; margin-top: 25px;">🔬 Física de la Fotografía</h3>
+                <p style="color: #bbb; line-height: 1.5;">Una cámara estenopeica es una caja oscura sin lente, equipada únicamente con un pequeño agujero (estenopo). La física detrás de ella se basa en que la luz viaja en <strong>línea recta</strong>.</p>
+                <ul style="color: #bbb; line-height: 1.5;">
+                    <li><strong>Proyección Invertida:</strong> Al obligar a los rayos a pasar por el minúsculo agujero, los rayos que rebotan en la parte de arriba del sujeto viajan hacia abajo en la caja, y viceversa. Por eso la imagen se proyecta boca abajo y del revés.</li>
+                    <li><strong>Estenopo (Diámetro):</strong> Si es pequeño, la luz no se dispersa y la imagen es súper nítida, pero tardarás mucho en capturarla. Si es grande, entra mucha luz de golpe, pero los rayos se abren (círculo de confusión) y la foto sale borrosa.</li>
+                    <li><strong>Distancia Focal (Largo de la caja):</strong> Funciona como un zoom. Si alargas la caja, la imagen crece. Pero al viajar más lejos, la luz pierde fuerza (Ley de la Inversa del Cuadrado) y necesitarás más tiempo de exposición.</li>
+                    <li><strong>Sensibilidad (ISO):</strong> Es la capacidad química del papel para absorber luz. Un papel ISO 1000 es extremadamente sensible y atrapará la imagen en fracciones de segundo.</li>
+                </ul>
+
+                <h3 style="color: #3498db; font-size: 1.3rem; margin-top: 20px;">🎮 Cómo usar el simulador</h3>
+                <ul style="color: #ddd; line-height: 1.6; background: #222; padding: 15px 15px 15px 35px; border-radius: 8px;">
+                    <li><strong>Ajusta tu cámara:</strong> Mueve los deslizadores para cambiar la focal (zoom) o el estenopo (nitidez).</li>
+                    <li><strong>Encuadra:</strong> Usa el botón de "Vista Previa" para asegurarte de que el objeto encuadra bien en la pared del fondo sin gastar papel.</li>
+                    <li><strong>Haz la foto:</strong> Apaga la vista previa y haz clic en <strong>"🔴 ABRIR ESTENOPO"</strong>. Vigila el cronómetro y vuelve a pulsar para cerrar el agujero cuando creas que ha entrado suficiente luz.</li>
+                    <li><strong>Siguiente paso:</strong> Si el mensaje dice "Exposición perfecta", pulsa en <strong>"IR AL CUARTO OSCURO"</strong> para revelar el papel físico.</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script src="sketch.js"></script>
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar-principal').classList.toggle('collapsed'); document.getElementById('area-principal').classList.toggle('expanded'); }
+        function abrirTutorial() { document.getElementById('modal-tutorial').style.display = 'flex'; }
+        function abrirInfo() { document.getElementById('modal-info').style.display = 'flex'; }
+    </script>
+</body>
+</html>
